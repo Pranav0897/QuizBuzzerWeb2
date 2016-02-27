@@ -2,6 +2,7 @@ var myFirebaseRef = new Firebase("https://quiz-buzzer-2.firebaseio.com/");
 var usersRef = myFirebaseRef.child("users");
 var questionRef = myFirebaseRef.child("question");
 var answersRef = myFirebaseRef.child("answers");
+var ansBy = myFirebaseRef.child("ansBy");
 
 var question = null;
 
@@ -73,14 +74,18 @@ function activate() {
 				document.getElementById("answeredStatusIndicator").innerHTML = "Press button to answer question";
 				document.getElementById("answerButton").style.visibility = '';
 			} else {
-				answersRef.orderByChild('date').once("child_added",function(snapshot) {
-					document.getElementById("answerButton").style.visibility = 'hidden';
-					var answerId = snapshot.val().user;
-					if(answerId == currentUserId) {
-						document.getElementById("answeredStatusIndicator").innerHTML = "Fast! You pressed the button first :)";
-					} else {
-						var ansTeamName = users[answerId].teamName;
-						document.getElementById("answeredStatusIndicator").innerHTML = "Too Slow! <b>" + ansTeamName + "</b> already pressed the button :(";
+				//answersRef.orderByChild('date').once("child_added",function(snapshot) {
+				ansBy.on("value", function(snapshot) {
+					var answerId = snapshot.val();
+					if(answerId != null) {
+						document.getElementById("answerButton").style.visibility = 'hidden';
+						console.log(answerId);
+						if(answerId == currentUserId) {
+							document.getElementById("answeredStatusIndicator").innerHTML = "Fast! You pressed the button first :)";
+						} else {
+							var ansTeamName = users[answerId].teamName;
+							document.getElementById("answeredStatusIndicator").innerHTML = "Too Slow! <b>" + ansTeamName + "</b> already pressed the button :(";
+						}
 					}
 				});
 			}
