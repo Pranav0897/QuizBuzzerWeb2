@@ -2,6 +2,7 @@ var myFirebaseRef = new Firebase("https://quiz-buzzer-2.firebaseio.com/");
 var usersRef = myFirebaseRef.child("users");
 var questionRef = myFirebaseRef.child("question");
 var answersRef = myFirebaseRef.child("answers");
+var ansBy = myFirebaseRef.child("ansBy");
 
 var users = null;
 usersRef.on("value",function(snapshot) {
@@ -23,6 +24,7 @@ function setQuestionActive() {
 		isAnswered : false
 	});
 	answersRef.set(null);
+	ansBy.set(null);
 }
 
 function setQuestionInactive() {
@@ -31,6 +33,7 @@ function setQuestionInactive() {
 		isAnswered : false
 	});
 	answersRef.set(null);
+	ansBy.set(null);
 }
 
 questionRef.onDisconnect().set({
@@ -46,6 +49,7 @@ function getPressedUser(action) {
 		var answeredUser = users[snapshot.val().user].teamName;
 		console.log(answeredUser);
 		action(answeredUser);
+		ansBy.set(snapshot.val().user);
 	});
 }
 
