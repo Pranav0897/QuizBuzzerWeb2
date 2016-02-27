@@ -1,35 +1,71 @@
-var myFirebaseRef = new Firebase("https://quiz-buzzer.firebaseio.com/");
-var isQuestionActiveRef = myFirebaseRef.child("isQuestionActive");
-var isQuestionAnsweredRef = myFirebaseRef.child("isQuestionAnswered");
+var myFirebaseRef = new Firebase("https://quiz-buzzer-2.firebaseio.com/");
+var usersRef = myFirebaseRef.child("users");
+var questionRef = myFirebaseRef.child("question");
+var answersRef = myFirebaseRef.child("answers");
+
+var users = null;
+usersRef.on("value",function(snapshot) {
+	users = snapshot.val();
+	var numOfUsers = snapshot.numChildren();
+	document.getElementById("num_connected").innerHTML = "Connected users : " + numOfUsers;
+	var list_root = document.getElementById("user_list");
+	list_root.innerHTML = "";
+	snapshot.forEach(function(user){
+		var user_item = document.createElement("li");
+		user_item.innerHTML = user.val().teamName;
+		list_root.appendChild(user_item);
+	});
+});
 
 function setQuestionActive() {
-	isQuestionAnsweredRef.set(false);
-	isQuestionActiveRef.set(true);
+	questionRef.set({
+		isActive : true,
+		isAnswered : false
+	});
+	answersRef.set(null);
 }
 
 function setQuestionInactive() {
-	isQuestionActiveRef.set(false);
-	isQuestionAnsweredRef.set(false);
+	questionRef.set({
+		isActive : false,
+		isAnswered : false
+	});
+	answersRef.set(null);
 }
 
-isQuestionActiveRef.on("value", function(snapshot) {
-	var isActive = snapshot.val();
-	if (isActive) {
-		document.getElementById('questionStatus').innerHTML = 'Active';
-		document.getElementById('answeredStatusDiv').style.visibility = 'visible';
-	}
-	else {
+questionRef.onDisconnect().set({
+	isActive : false,
+	isAnswered : false
+});
+answersRef.onDisconnect().set(null);
+
+
+function getPressedUser(action) {
+	answersRef.orderByChild('date').once("child_added",function(snapshot) {
+		console.log(snapshot.val());
+		var answeredUser = users[snapshot.val().user].teamName;
+		console.log(answeredUser);
+		action(answeredUser);
+	});
+}
+
+questionRef.on("value",function(snapshot) {
+	var isActive = snapshot.val().isActive;
+	var isAnswered = snapshot.val().isAnswered;
+	if (!isActive) {
 		document.getElementById('questionStatus').innerHTML = 'Inactive';
 		document.getElementById('answeredStatusDiv').style.visibility = 'hidden';
-	}
-});
+	} else {
+		document.getElementById('questionStatus').innerHTML = 'Active';
+		document.getElementById('answeredStatusDiv').style.visibility = 'visible';
 
-isQuestionAnsweredRef.on("value", function(snapshot) {
-	var isAnswered = snapshot.val();
-	if (isAnswered) {
-		document.getElementById('answerStatus').innerHTML = 'Yes';
-	}
-	else {
-		document.getElementById('answerStatus').innerHTML = 'No';
+		//set is answered status
+		if(!isAnswered) {
+			document.getElementById('answerStatus').innerHTML = 'No';
+		} else {
+			getPressedUser(function(user) {
+				document.getElementById('answerStatus').innerHTML = 'Yes by <b>' + user + '</b>';
+			});
+		}
 	}
 });

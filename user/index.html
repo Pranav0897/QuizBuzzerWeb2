@@ -8,14 +8,24 @@
 <body>
     <script src="demo.js"></script>
     <h1>EES Quiz Buzzer - User Mode</h1>
-    <div id="questionStatusDiv">
-        <h2>Question Status</h2>
-        <p id="questionStatus">Inactive</p>
+    <div id="userNameDiv">
+        <input type="text" id="userNameInput" placeholder="Enter team name" />
+        <input type="button" id="clickButton" value="click" onclick="onCheckUserName();" />
     </div>
-    <div id="answeredButtonDiv" style="visibility:hidden">
-        <h2>Buzzer</h2>
-        <p id="answeredStatusIndicator">Press button to answer question</p>
-        <input id="answerButton" type="button" onclick="onAnswerButtonClick()" value="Answer Question">
+    <div id="content" style="visibility:hidden">
+        <div id="userNameDiv">
+            <p id="user_name"></p>
+            <p id="other_users">Connected with 0 other users</p>
+        </div>
+        <div id="questionStatusDiv">
+            <h2>Question Status</h2>
+            <p id="questionStatus">Inactive</p>
+        </div>
+        <div id="answeredButtonDiv" style="visibility:hidden">
+            <h2>Buzzer</h2>
+            <p id="answeredStatusIndicator">Press button to answer question</p>
+            <input id="answerButton" type="button" onclick="onAnswerButtonClick()" value="Answer Question">
+        </div>
     </div>
 </body>
 </html>
